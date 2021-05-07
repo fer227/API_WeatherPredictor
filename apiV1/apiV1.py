@@ -6,7 +6,7 @@ from datetime import datetime
 import pandas as pd
 
 def predecir(period):
-    pred_temp = pickle.load( open('./model_temperatura.p', 'rb') )
+    pred_temp = pickle.load( open('./modelo_temperatura.p', 'rb') )
     pred_hum = pickle.load( open('./modelo_humedad.p', 'rb') )
 
     prediccion_temp = pred_temp.predict(n_periods=period)
