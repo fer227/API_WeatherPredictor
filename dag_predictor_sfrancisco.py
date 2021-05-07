@@ -177,4 +177,10 @@ LanzarTestV2 = BashOperator(
 
 
 # Árbol de dependencias
-CrearDirectorio >> [ObtenerDatosHumedad, ObtenerDatosTemperatura] >> DescomprimirDatosHumedad >> DescomprimirDatosTemperatura >> FormatearDatos >> LanzarMongo >> [ImportarDatosMongo, ClonarRepositorio] >> DescomprimirModelos >> [ConstruirImagenDockerV1, ConstruirImagenDockerV2] >> LanzarImagenDockerV1 >> LanzarImagenDockerV2 >> [LanzarTestV1, LanzarTestV2]
+CrearDirectorio >> [ObtenerDatosHumedad, ObtenerDatosTemperatura] 
+ObtenerDatosHumedad >> [DescomprimirDatosHumedad, DescomprimirDatosTemperatura] 
+ObtenerDatosTemperatura >> [DescomprimirDatosHumedad, DescomprimirDatosTemperatura]
+DescomprimirDatosHumedad >> FormatearDatos >> LanzarMongo >> [ImportarDatosMongo, ClonarRepositorio] >> DescomprimirModelos >> [ConstruirImagenDockerV1, ConstruirImagenDockerV2]
+DescomprimirDatosTemperatura >> FormatearDatos >> LanzarMongo >> [ImportarDatosMongo, ClonarRepositorio] >> DescomprimirModelos >> [ConstruirImagenDockerV1, ConstruirImagenDockerV2]
+ConstruirImagenDockerV1 >> LanzarImagenDockerV1 >> LanzarTestV1
+ConstruirImagenDockerV2 >> LanzarImagenDockerV2 >> LanzarTestV2
