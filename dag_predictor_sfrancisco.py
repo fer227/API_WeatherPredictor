@@ -5,6 +5,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 import pandas
 
+# Parámetros generales de airflow
 default_args = {
     'owner': 'Fernando Izquierdo',
     'depends_on_past': False,
@@ -37,6 +38,7 @@ dag = DAG(
     schedule_interval=timedelta(days=1),
 )
 
+# Función para formatear los datos del CSV en DATE-TEMP-HUM
 def FormatearDatos():
     df_humedad = pandas.read_csv('/home/fer227/workdir/humidity.csv')
     df_temperatura = pandas.read_csv('/home/fer227/workdir/temperature.csv')
@@ -54,7 +56,7 @@ def FormatearDatos():
 
     df_formateado.to_csv('/home/fer227/workdir/datos.csv', index=False)
 
-
+# Creamos el directorio de trabajo donde se desarrollará todo lo siguiente
 CrearDirectorio = BashOperator(
 		task_id='CrearDirectorio',
 		depends_on_past=False,
@@ -62,7 +64,7 @@ CrearDirectorio = BashOperator(
 		dag=dag
 		)
 
-
+# Descargamos los datos de humedad del repositorio de Github
 ObtenerDatosHumedad = BashOperator(
 		task_id='ObtenerDatosHumedad',
 		depends_on_past=False,
@@ -70,6 +72,7 @@ ObtenerDatosHumedad = BashOperator(
 		dag=dag
 		)
 
+# Descargamos los datos de temperatura del repositorio de Github
 ObtenerDatosTemperatura = BashOperator(
 		task_id='ObtenerDatosTemperatura',
 		depends_on_past=False,
@@ -77,6 +80,7 @@ ObtenerDatosTemperatura = BashOperator(
 		dag=dag
 		)
 
+# Descomprimimos los datos de humedad y obtenemos el csv
 DescomprimirDatosHumedad = BashOperator(
 		task_id='DescomprimirDatosHumedad',
 		depends_on_past=True,
@@ -84,6 +88,7 @@ DescomprimirDatosHumedad = BashOperator(
 		dag=dag
 		)
 
+# Descomprimimos los datos de temperatura y obtenemos el csv
 DescomprimirDatosTemperatura = BashOperator(
 		task_id='DescomprimirDatosTemperatura',
 		depends_on_past=True,
@@ -91,6 +96,7 @@ DescomprimirDatosTemperatura = BashOperator(
    		dag=dag
 		)
 
+# Llamamos a la función indicada anteriormente para formatear los datos a nuestro gusto
 FormatearDatos = PythonOperator(
 		task_id='FormatearDatos',
 		depends_on_past=True,
@@ -98,6 +104,7 @@ FormatearDatos = PythonOperator(
 		dag=dag
 		)
 
+# Lanzamos una imagen de Mongo para almacenar los datos
 LanzarMongo = BashOperator(
     task_id='LanzarMongo',
     depends_on_past=True,
@@ -105,6 +112,7 @@ LanzarMongo = BashOperator(
     dag=dag,
 )
 
+# Importamos el csv procesado en la base de datos de Mongo
 ImportarDatosMongo = BashOperator(
     task_id='ImportarDatosMongo',
     depends_on_past=True,
@@ -112,6 +120,7 @@ ImportarDatosMongo = BashOperator(
     dag=dag,
 )
 
+# Clonamos mi repositorio con el código de las APIs (es decir, los microservicios)
 ClonarRepositorio = BashOperator(
     task_id='ClonarRepositorio',
     depends_on_past=True,
@@ -119,6 +128,8 @@ ClonarRepositorio = BashOperator(
     dag=dag,
 )
 
+# Esta tarea sirve para entrenar los modelos predictores de humedad y temperatura
+# Para mejorar el testeo y despligue, esta tarea la hice solo una vez y subí en .zip esos dos modelos para no tener que crearlos continuamente
 #EntrenarModelos = BashOperator(
 #    task_id='EntrenarModelos',
 #    depends_on_past=True,
@@ -126,6 +137,7 @@ ClonarRepositorio = BashOperator(
 #    dag=dag,
 #)
 
+# Descomprimir los modelos predictores de humedad y temperatura descargados del Github
 DescomprimirModelos = BashOperator(
     task_id='DescomprimirModelos',
     depends_on_past=True,
@@ -133,6 +145,7 @@ DescomprimirModelos = BashOperator(
     dag=dag,
 )
 
+# Construimos la imagen de Docker de la primera API
 ConstruirImagenDockerV1 = BashOperator(
     task_id='ConstruirImagenDockerV1',
     depends_on_past=True,
@@ -140,6 +153,7 @@ ConstruirImagenDockerV1 = BashOperator(
     dag=dag,
 )
 
+# Lanzamos la imagen creada anteriormente
 LanzarImagenDockerV1 = BashOperator(
     task_id='LanzarImagenDockerV1',
     depends_on_past=True,
@@ -147,6 +161,7 @@ LanzarImagenDockerV1 = BashOperator(
     dag=dag,
 )
 
+# Construimos la imagen de Docker de la segunda API
 ConstruirImagenDockerV2 = BashOperator(
     task_id='ConstruirImagenDockerV2',
     depends_on_past=True,
@@ -154,6 +169,7 @@ ConstruirImagenDockerV2 = BashOperator(
     dag=dag,
 )
 
+# Lanzamos la imagen creada anteriormente
 LanzarImagenDockerV2 = BashOperator(
     task_id='LanzarImagenDockerV2',
     depends_on_past=True,
@@ -161,6 +177,7 @@ LanzarImagenDockerV2 = BashOperator(
     dag=dag,
 )
 
+# Lanzamos los test para comprobar que el servicio está activo y responde para la API v1
 LanzarTestV1 = BashOperator(
     task_id='LanzarTestV1',
     depends_on_past=True,
@@ -168,6 +185,7 @@ LanzarTestV1 = BashOperator(
     dag=dag,
 )
 
+# Lanzamos los test para comprobar que el servicio está activo y responde para la API v2
 LanzarTestV2 = BashOperator(
     task_id='LanzarTestV2',
     depends_on_past=True,
