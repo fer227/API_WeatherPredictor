@@ -24,7 +24,7 @@ def entrenar():
         suppress_warnings=True,
         stepwise=True)
 
-    pickle.dump(modelo_temperatura, open("./model_temperatura.p", "wb" ) )
+    pickle.dump(modelo_temperatura, open("./modelo_temperatura.p", "wb" ) )
 
     modelo_humedad = pmdarima.auto_arima(
         df['HUM'],
