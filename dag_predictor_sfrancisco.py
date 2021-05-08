@@ -164,14 +164,14 @@ LanzarImagenDockerV2 = BashOperator(
 LanzarTestV1 = BashOperator(
     task_id='LanzarTestV1',
     depends_on_past=True,
-    bash_command="cd /home/fer227/workdir/API_WeatherPredictor/apiV1 && python -m pytest test.py",
+    bash_command="cd /home/fer227/workdir/API_WeatherPredictor/apiV1 && python3 -m pytest test.py",
     dag=dag,
 )
 
 LanzarTestV2 = BashOperator(
     task_id='LanzarTestV2',
     depends_on_past=True,
-    bash_command="cd /home/fer227/workdir/API_WeatherPredictor/apiV2 && python -m pytest test.py",
+    bash_command="cd /home/fer227/workdir/API_WeatherPredictor/apiV2 && python3 -m pytest test.py",
     dag=dag,
 )
 
